@@ -23,7 +23,7 @@ function Scene($el) {
   this.$scene.on('mousewheel', function( event ) {
     var n = (event.originalEvent.wheelDelta /120 > 0) ? .1 : -.1;
 
-    self.scale = this.scale + n;
+    self.scale += n;
   });
 
   this.$scene.on('mousemove mousewheel', function() {
