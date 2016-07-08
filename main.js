@@ -1,41 +1,28 @@
-var rotate = 100;
-var pageX = $(document).width();
-var pageY = $(document).height();
-
 function applyCssTransform($el, rX, rY, tX, tY, scale) {
-  $el.css('transform', 'rotateY(' + rY + 'deg) rotateX(' + rX + 'deg) translate(' + tX + 'px, ' + tY + 'px) scale(' + scale + ')');
+  $el.css('transform', 'translate(' + tX + 'px, ' + tY + 'px) scale(' + scale + ')');
+  $el.find('.page').css('transform', 'rotateY(' + rY + 'deg) rotateX(' + rX + 'deg)');
 }
 
 function initSceneView() {
   $('.scene').each(function() {
     var $scene = $(this);
-    var mouseX = 0;
-    var mouseY = 0;
+    var $content = $(this).find('.scene-content');
     var rotateX = 0;
     var rotateY = 0;
     var translateX = 0;
     var translateY = 0;
     var scale = 1
-    var mouseDownStarted = [];
+    var mouseDownStarted = [[0, 0], [0, 0]];
 
     $scene.on('mousedown', function( event ) {
-      mouseDownStarted = [event.pageX - translateX, event.pageY - translateY];
-    });
-
-    $scene.on('mouseup', function( event ) {
-      $scene.bind('mousedown')
+      mouseDownStarted[0] = [event.pageX - translateX, event.pageY - translateY];
     });
 
     $scene.on('mousemove', function( event ) {
       if (event.buttons == 1) {
         event.preventDefault();
-        translateX = event.pageX - mouseDownStarted[0];
-        translateY = event.pageY - mouseDownStarted[1];
-      } else {
-        mouseX = event.pageY;
-        mouseY = event.pageX;
-        rotateY = -(pageY / 2 - mouseY) / pageY * rotate;
-        rotateX = (pageX/2 - mouseX) / pageX * rotate;
+        translateX = event.pageX - mouseDownStarted[0][0];
+        translateY = event.pageY - mouseDownStarted[0][1];
       }
     });
 
@@ -45,9 +32,25 @@ function initSceneView() {
     });
 
     $scene.on('mousemove mousewheel', function() {
-      var $content = $(this).find('.scene-content');
-
       applyCssTransform($content, rotateX, rotateY, translateX, translateY, scale);
+    });
+
+    $content.on('mousedown', function( event ) {
+      event.stopPropagation();
+
+      mouseDownStarted[1] = [event.pageX, event.pageY];
+    });
+
+    $content.on('mousemove', function(event) {
+      event.stopPropagation();
+
+      if (event.buttons == 1) {
+        event.preventDefault();
+        rotateY = (event.pageX - mouseDownStarted[1][0]) / 2;
+        rotateX = (event.pageY - mouseDownStarted[1][1]) / 2;
+      }
+
+      applyCssTransform($(this), rotateX, rotateY, translateX, translateY, scale);
     });
   });
 }
