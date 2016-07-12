@@ -1,35 +1,27 @@
 function Scene($el) {
   var self = this;
+  var mouseDownStarted = [];
 
   this.$scene = $el;
   this.contents = [];
+  this.translateX = 0;
+  this.translateY = 0;
 
-  $(document).on('keypress', function(e) {
-    switch (e.keyCode) {
-      case 122: //Up
-        self.contents.forEach(function(content) {
-          content.translateY -= 10;
-          content.translateScale();
-        });
-        break;
-      case 115: //Down
-        self.contents.forEach(function(content) {
-          content.translateY += 10;
-          content.translateScale();
-        });
-        break;
-      case 113: //left
-        self.contents.forEach(function(content) {
-          content.translateX -= 10;
-          content.translateScale();
-        });
-        break;
-      case 100: //Right
-        self.contents.forEach(function(content) {
-          content.translateX += 10;
-          content.translateScale();
-        });
-        break;
+  this.$scene.on('mousedown', function( event ) {
+    mouseDownStarted = [event.pageX - self.translateX, event.pageY - self.translateY];
+  });
+
+  this.$scene.on('mousemove', function( event ) {
+    event.preventDefault();
+
+    if (event.buttons == 1) {
+      self.contents.forEach(function(content) {
+        self.translateX = event.pageX - mouseDownStarted[0];
+        self.translateY = event.pageY - mouseDownStarted[1];
+        content.translateX += self.translateX / 2;
+        content.translateY += self.translateY / 2;
+        content.translateScale();
+      });
     }
   });
 }
