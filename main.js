@@ -1,14 +1,13 @@
 function Scene($el) {
   var self = this;
-  var mouseDownStarted = [];
 
   this.$scene = $el;
   this.contents = [];
-  this.translateX = 0;
-  this.translateY = 0;
 
   this.$scene.on('mousedown', function( event ) {
-    mouseDownStarted = [event.pageX - self.translateX, event.pageY - self.translateY];
+    self.contents.forEach(function(content) {
+      content.mouseDownStarted = [event.pageX - content.translateX, event.pageY - content.translateY];
+    });
   });
 
   this.$scene.on('mousemove', function( event ) {
@@ -16,24 +15,21 @@ function Scene($el) {
 
     if (event.buttons == 1) {
       self.contents.forEach(function(content) {
-        self.translateX = event.pageX - mouseDownStarted[0];
-        self.translateY = event.pageY - mouseDownStarted[1];
-        content.translateX += self.translateX / 2;
-        content.translateY += self.translateY / 2;
+        content.translateX = event.pageX - content.mouseDownStarted[0];
+        content.translateY = event.pageY - content.mouseDownStarted[1];
         content.translateScale();
       });
     }
   });
 }
 
-
 function SceneContent($el) {
-  var mouseDownStarted = [];
   var self = this;
   var pageX = $el.width();
   var pageY = $el.height();
 
   this.$content = $el;
+  this.mouseDownStarted = [];
   this.rotateX = 0;
   this.rotateY = 0;
   this.scale = 1;
@@ -43,7 +39,7 @@ function SceneContent($el) {
   this.$content.on('mousedown', function( event ) {
     event.stopPropagation();
 
-    mouseDownStarted = [event.pageX - self.translateX, event.pageY - self.translateY];
+    self.mouseDownStarted = [event.pageX - self.translateX, event.pageY - self.translateY];
   });
 
   this.$content.on('mousemove', function(event) {
@@ -52,8 +48,8 @@ function SceneContent($el) {
     if (event.buttons == 1) {
       event.preventDefault();
 
-      self.translateX = event.pageX - mouseDownStarted[0];
-      self.translateY = event.pageY - mouseDownStarted[1];
+      self.translateX = event.pageX - self.mouseDownStarted[0];
+      self.translateY = event.pageY - self.mouseDownStarted[1];
     }
 
     if (self.$content.hasClass('rotation')) {
