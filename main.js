@@ -53,11 +53,12 @@ function SceneContent($el) {
     }
 
     if (self.$content.hasClass('rotation')) {
-      var mouseX = event.pageY;
-      var mouseY = event.pageX;
+      var $contentOffset = self.$content.offset()
+      var mouseX = event.pageY - $contentOffset.top;
+      var mouseY = event.pageX - $contentOffset.left;
 
-      self.rotateY = -(pageY / 2 - mouseY) / pageY * 240;
-      self.rotateX = (pageX/2 - mouseX) / pageX * 240;
+      self.rotateY = -(pageY / 2 - mouseY) / pageY * 360;
+      self.rotateX = (pageX / 2 - mouseX) / pageX * 360;
       self.rotate();
     }
   });
